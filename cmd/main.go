@@ -1,5 +1,11 @@
-package cmd
+package main
+
+import (
+	"fmt"
+
+	"github.com/dmonteroh/distributed-resource-collector/internal"
+)
 
 func main() {
-	internal.diskUsage()
+	fmt.Println(internal.GetDiskUsage())
 }
