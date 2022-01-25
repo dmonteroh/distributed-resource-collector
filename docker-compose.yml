@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  app:
+    container_name: distributed-resource-collector
+    image: distributed-resource-collector
+    build:
+      context: .
+      target: development
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
