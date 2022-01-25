@@ -7,7 +7,7 @@ import (
 	"github.com/shirou/gopsutil/disk"
 )
 
-type drcDiskStat struct {
+type DrcDiskStats struct {
 	Device       string  `json:"device"`
 	SerialNumber string  `json:"serialNumber"`
 	Path         string  `json:"path"`
@@ -18,23 +18,23 @@ type drcDiskStat struct {
 	UsedPercent  float64 `json:"usedPercent"`
 }
 
-func (d drcDiskStat) String() string {
+func (d DrcDiskStats) String() string {
 	s, _ := json.Marshal(d)
 	return string(s)
 }
 
-func GetDiskUsage() []*drcDiskStat {
+func GetDiskUsage() []DrcDiskStats {
 	parts, err := disk.Partitions(false)
 	CheckError(err)
 
-	var drcUsage []*drcDiskStat
+	var drcUsage []DrcDiskStats
 
 	for _, part := range parts {
 		u, err := disk.Usage(part.Mountpoint)
 		CheckError(err)
 
 		if !strings.Contains(u.Path, "/snap/") {
-			tmpUsage := drcDiskStat{
+			tmpUsage := DrcDiskStats{
 				Device:       part.Device,
 				SerialNumber: disk.GetDiskSerialNumber(part.Device),
 				Path:         u.Path,
@@ -45,7 +45,7 @@ func GetDiskUsage() []*drcDiskStat {
 				UsedPercent:  u.UsedPercent,
 			}
 			//fmt.Println(tmpUsage)
-			drcUsage = append(drcUsage, &tmpUsage)
+			drcUsage = append(drcUsage, tmpUsage)
 		}
 	}
 	return drcUsage

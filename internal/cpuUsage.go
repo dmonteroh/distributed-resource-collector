@@ -8,20 +8,20 @@ import (
 	"github.com/shirou/gopsutil/cpu"
 )
 
-type drcCPUStat struct {
+type DrcCPUStats struct {
 	ModelName    string    `json:"modelName"`
 	VendorID     string    `json:"vendorId"`
 	AverageUsage float64   `json:"averageUsage"`
 	CoreUsage    []float64 `json:"coreUsage"`
 }
 
-func (d drcCPUStat) String() string {
+func (d DrcCPUStats) String() string {
 	s, _ := json.Marshal(d)
 	return string(s)
 }
 
-func GetCPUUsage() (CPUStats drcCPUStat) {
-	tmpCPU, _ := cpu.Percent(time.Second/10, true)
+func GetCPUUsage() (CPUStats DrcCPUStats) {
+	tmpCPU, _ := cpu.Percent(time.Second/5, true)
 	totalPercent := 0.0
 	for _, percent := range tmpCPU {
 		totalPercent += percent
@@ -50,7 +50,7 @@ func GetCPUUsage() (CPUStats drcCPUStat) {
 		vendor = vendorList[0]
 	}
 
-	return drcCPUStat{
+	return DrcCPUStats{
 		ModelName:    model,
 		VendorID:     vendor,
 		AverageUsage: totalPercent / float64(len(tmpCPU)),

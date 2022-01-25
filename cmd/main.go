@@ -1,23 +1,15 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
 
-	"github.com/dmonteroh/distributed-resource-collector/internal"
+	"github.com/dmonteroh/distributed-resource-collector/pkg"
 )
 
 func main() {
-	fmt.Println("Disk Usage:")
-	diskUsage := internal.GetDiskUsage()
-	for _, u := range diskUsage {
-		fmt.Println(u.String())
-	}
+	r := gin.Default()
 
-	fmt.Println("CPU Stats:")
-	cpuStats := internal.GetCPUUsage()
-	fmt.Println(cpuStats)
+	r.GET("/heartbeat", pkg.HeartbeatEndpoint)
 
-	fmt.Println("Mem Stats:")
-	memStats := internal.GetMemoryUsage()
-	fmt.Println(memStats)
+	r.Run(":8080")
 }
