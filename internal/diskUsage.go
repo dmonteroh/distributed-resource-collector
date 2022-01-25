@@ -16,13 +16,13 @@ type drcDiskStat struct {
 
 func GetDiskUsage() []*drcDiskStat {
 	parts, err := disk.Partitions(false)
-	check(err)
+	CheckError(err)
 
 	var drcUsage []*drcDiskStat
 
 	for _, part := range parts {
 		u, err := disk.Usage(part.Mountpoint)
-		check(err)
+		CheckError(err)
 
 		if !strings.Contains(u.Path, "/snap/") {
 			tmpUsage := drcDiskStat{
@@ -37,10 +37,4 @@ func GetDiskUsage() []*drcDiskStat {
 		}
 	}
 	return drcUsage
-}
-
-func check(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
