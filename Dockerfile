@@ -1,8 +1,8 @@
-FROM golang:1.17.2 as development
+FROM golang:1.17.2-alpine as development
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY go.mod go.sum .env ./
 RUN go mod download
 
 COPY . .
@@ -11,5 +11,4 @@ RUN go install github.com/cespare/reflex@latest
 
 EXPOSE 8080
 
-CMD export GIN_MODE=release
 CMD reflex -g '*.go' go run cmd/main.go --start-service
