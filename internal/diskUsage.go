@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/shirou/gopsutil/disk"
 )
@@ -33,7 +32,7 @@ func GetDiskUsage() []DrcDiskStats {
 		u, err := disk.Usage(part.Mountpoint)
 		CheckError(err)
 
-		if !strings.Contains(u.Path, "/snap/") {
+		if !CustomContains(u.Path, "/snap/", "/etc/") {
 			tmpUsage := DrcDiskStats{
 				Device:       part.Device,
 				SerialNumber: disk.GetDiskSerialNumber(part.Device),

@@ -2,6 +2,8 @@ package internal
 
 import (
 	"fmt"
+	"os"
+	"strings"
 )
 
 func CheckError(err error) {
@@ -24,4 +26,25 @@ func UniqueString(slice []string) (unique []string) {
 		}
 	}
 	return unique
+}
+
+func CustomContains(str string, subStrings ...string) bool {
+	if len(subStrings) == 0 {
+		return true
+	}
+
+	for _, subString := range subStrings {
+		if strings.Contains(str, subString) {
+			return true
+		}
+	}
+	return false
+}
+
+func InDockerContainer() bool {
+	if _, err := os.Stat("/.dockerenv"); err == nil {
+		return true
+	}
+
+	return false
 }
