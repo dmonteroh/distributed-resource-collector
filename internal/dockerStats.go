@@ -64,9 +64,9 @@ type DrcDockerSocketStats struct {
 	Mounts          []DockerMount     `json:"Mounts"`
 }
 
-func ToStruct(v string) (DockerStats []DrcDockerSocketStats) {
-	json.Unmarshal([]byte(v), &DockerStats)
-	return DockerStats
+func DrcJsonToStruct(v string) (socketStats []DrcDockerSocketStats) {
+	json.Unmarshal([]byte(v), &socketStats)
+	return socketStats
 }
 
 func (d DrcDockerSocketStats) String() string {
@@ -87,7 +87,7 @@ func GetDockerSocketStats() (result string) {
 func GetDockerStats() (dockerStats []DrcDockerStats) {
 
 	if InDockerContainer() {
-		tmpStats := ToStruct(GetDockerSocketStats())
+		tmpStats := DrcJsonToStruct(GetDockerSocketStats())
 		for _, container := range tmpStats {
 			//fmt.Println(container.String())
 			tmp := DrcDockerStats{
