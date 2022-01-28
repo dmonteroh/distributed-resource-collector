@@ -7,14 +7,14 @@ import (
 )
 
 type DrcDiskStats struct {
-	Device       string  `json:"device"`
-	SerialNumber string  `json:"serialNumber"`
-	Path         string  `json:"path"`
-	Label        string  `json:"label"`
-	Fstype       string  `json:"fstype"`
-	Total        uint64  `json:"total"`
-	Used         uint64  `json:"used"`
-	UsedPercent  float64 `json:"usedPercent"`
+	Device string `json:"device"`
+	//SerialNumber string  `json:"serialNumber"`
+	Path        string  `json:"path"`
+	Label       string  `json:"label"`
+	Fstype      string  `json:"fstype"`
+	Total       uint64  `json:"total"`
+	Used        uint64  `json:"used"`
+	UsedPercent float64 `json:"usedPercent"`
 }
 
 func (d DrcDiskStats) String() string {
@@ -34,14 +34,14 @@ func GetDiskUsage() []DrcDiskStats {
 
 		if !CustomContains(u.Path, "/snap/", "/etc/") {
 			tmpUsage := DrcDiskStats{
-				Device:       part.Device,
-				SerialNumber: disk.GetDiskSerialNumber(part.Device),
-				Path:         u.Path,
-				Label:        disk.GetLabel(part.Device),
-				Fstype:       part.Fstype,
-				Total:        u.Total,
-				Used:         u.Used,
-				UsedPercent:  u.UsedPercent,
+				Device: part.Device,
+				//SerialNumber: disk.GetDiskSerialNumber(part.Device),
+				Path:        u.Path,
+				Label:       disk.GetLabel(part.Device),
+				Fstype:      part.Fstype,
+				Total:       u.Total,
+				Used:        u.Used,
+				UsedPercent: u.UsedPercent,
 			}
 			//fmt.Println(tmpUsage)
 			drcUsage = append(drcUsage, tmpUsage)
