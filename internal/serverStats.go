@@ -1,29 +1,8 @@
 package internal
 
 import (
-	"encoding/json"
 	"time"
 )
-
-type DcrStats struct {
-	Timestamp  DcrTimestamp     `json:"timestamp"`
-	CPUStats   DrcCPUStats      `json:"cpuStats"`
-	MemStats   DrcMemStats      `json:"memStats"`
-	DiskStats  []DrcDiskStats   `json:"diskStats"`
-	ProcStats  DrcProcStats     `json:"procStats"`
-	DockerSats []DrcDockerStats `json:"dockerStats"`
-}
-
-type DcrTimestamp struct {
-	TimeLocal   time.Time `json:"timeLocal"`
-	TimeSeconds int64     `json:"timeSeconds"`
-	TimeNano    int64     `json:"timeNano"`
-}
-
-func (d DcrStats) String() string {
-	s, _ := json.Marshal(d)
-	return string(s)
-}
 
 func GetServerStats() (dcrStats DcrStats) {
 	tmpTime := time.Now()

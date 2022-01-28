@@ -11,14 +11,7 @@ import (
 	"github.com/shirou/gopsutil/docker"
 )
 
-type DrcDockerStats struct {
-	ContainerID string `json:"containerID"`
-	Name        string `json:"name"`
-	Image       string `json:"image"`
-	Status      string `json:"status"`
-	State       string `json:"State"`
-}
-
+// -- DOCKER INTERNAL STRUCTS
 type DockerPort struct {
 	IP          string `json:"IP"`
 	PrivatePort int16  `json:"PrivatePort"`
@@ -77,11 +70,6 @@ func ToStruct(v string) (DockerStats []DrcDockerSocketStats) {
 }
 
 func (d DrcDockerSocketStats) String() string {
-	s, _ := json.Marshal(d)
-	return string(s)
-}
-
-func (d DrcDockerStats) String() string {
 	s, _ := json.Marshal(d)
 	return string(s)
 }
