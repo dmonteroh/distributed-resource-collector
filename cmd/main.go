@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/dmonteroh/distributed-resource-collector/pkg"
@@ -11,5 +13,5 @@ func main() {
 
 	r.GET("/heartbeat", pkg.HeartbeatEndpoint)
 
-	r.Run(":8080")
+	r.Run(":" + os.Getenv("INTERNAL_PORT"))
 }
