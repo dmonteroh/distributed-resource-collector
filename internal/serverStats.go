@@ -5,16 +5,12 @@ import (
 )
 
 func GetServerStats() (dcrStats DrcStats) {
-
-	GetHostStats()
-
 	tmpTime := time.Now()
 	timestamp := DrcTimestamp{
 		TimeLocal:   tmpTime,
 		TimeSeconds: tmpTime.Unix(),
 		TimeNano:    tmpTime.UnixNano(),
 	}
-
 	return DrcStats{
 		Timestamp:  timestamp,
 		DrcHost:    GetHostStats(),

@@ -6,8 +6,7 @@ import (
 
 func GetHostStats() (drcHost DrcHost) {
 	tmpHost, _ := host.Info()
-
-	drcHost = DrcHost{
+	return DrcHost{
 		Hostname:             tmpHost.Hostname,
 		Uptime:               int64(tmpHost.Uptime),
 		BootTime:             int64(tmpHost.BootTime),
@@ -16,6 +15,4 @@ func GetHostStats() (drcHost DrcHost) {
 		VirtualizationRole:   tmpHost.VirtualizationRole,
 		HostID:               tmpHost.HostID,
 	}
-
-	return drcHost
 }

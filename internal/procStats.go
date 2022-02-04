@@ -6,7 +6,6 @@ import (
 
 func GetProcStats() (procStats DrcProcStats) {
 	tmpProcs, _ := load.Misc()
-
 	return DrcProcStats{
 		TotalProcs:   tmpProcs.ProcsTotal,
 		CreatedProcs: tmpProcs.ProcsCreated,

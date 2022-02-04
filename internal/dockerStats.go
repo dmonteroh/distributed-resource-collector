@@ -85,7 +85,6 @@ func GetDockerSocketStats() (result string) {
 }
 
 func GetDockerStats() (dockerStats []DrcDockerStats) {
-
 	if InDockerContainer() {
 		tmpStats := DrcJsonToStruct(GetDockerSocketStats())
 		for _, container := range tmpStats {
@@ -113,6 +112,5 @@ func GetDockerStats() (dockerStats []DrcDockerStats) {
 		}
 
 	}
-
 	return dockerStats
 }
