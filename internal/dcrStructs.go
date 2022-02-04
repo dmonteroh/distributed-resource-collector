@@ -75,20 +75,37 @@ func (d DrcDockerStats) String() string {
 }
 
 // -- TIMESTAMP
-type DcrTimestamp struct {
+type DrcTimestamp struct {
 	TimeLocal   time.Time `json:"timeLocal"`
 	TimeSeconds int64     `json:"timeSeconds"`
 	TimeNano    int64     `json:"timeNano"`
 }
 
-func (d DcrTimestamp) String() string {
+func (d DrcTimestamp) String() string {
+	s, _ := json.Marshal(d)
+	return string(s)
+}
+
+// -- HOST INFO
+type DrcHost struct {
+	Hostname             string `json:"hostname"`
+	Uptime               int64  `json:"uptime"`
+	BootTime             int64  `json:"boottime"`
+	Platform             string `json:"platform"`
+	VirtualizationSystem string `json:"virtualizationSystem"`
+	VirtualizationRole   string `json:"virtualizationRole"`
+	HostID               string `json:"hostid"`
+}
+
+func (d DrcHost) String() string {
 	s, _ := json.Marshal(d)
 	return string(s)
 }
 
 // -- RESPONSE OBJECT
-type DcrStats struct {
-	Timestamp  DcrTimestamp     `json:"timestamp"`
+type DrcStats struct {
+	Timestamp  DrcTimestamp     `json:"timestamp"`
+	DrcHost    DrcHost          `json:"host"`
 	CPUStats   DrcCPUStats      `json:"cpuStats"`
 	MemStats   DrcMemStats      `json:"memStats"`
 	DiskStats  []DrcDiskStats   `json:"diskStats"`
@@ -96,7 +113,7 @@ type DcrStats struct {
 	DockerSats []DrcDockerStats `json:"dockerStats"`
 }
 
-func (d DcrStats) String() string {
+func (d DrcStats) String() string {
 	s, _ := json.Marshal(d)
 	return string(s)
 }

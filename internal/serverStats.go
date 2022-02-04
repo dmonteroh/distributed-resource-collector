@@ -4,16 +4,20 @@ import (
 	"time"
 )
 
-func GetServerStats() (dcrStats DcrStats) {
+func GetServerStats() (dcrStats DrcStats) {
+
+	GetHostStats()
+
 	tmpTime := time.Now()
-	timestamp := DcrTimestamp{
+	timestamp := DrcTimestamp{
 		TimeLocal:   tmpTime,
 		TimeSeconds: tmpTime.Unix(),
 		TimeNano:    tmpTime.UnixNano(),
 	}
 
-	return DcrStats{
+	return DrcStats{
 		Timestamp:  timestamp,
+		DrcHost:    GetHostStats(),
 		CPUStats:   GetCPUUsage(),
 		MemStats:   GetMemoryUsage(),
 		DiskStats:  GetDiskUsage(),
