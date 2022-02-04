@@ -6,8 +6,9 @@ COPY go.mod go.sum .env ./
 RUN go mod download
 
 COPY . .
-RUN go build -o /build
 
-EXPOSE $INTERNAL_PORT
+RUN go install github.com/cespare/reflex@latest
 
-CMD [ "/build" ]
+EXPOSE 8080
+
+CMD reflex -g '*.go' go run cmd/main.go --start-service

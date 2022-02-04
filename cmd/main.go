@@ -10,8 +10,13 @@ import (
 
 func main() {
 	r := gin.Default()
-
-	r.GET("/heartbeat", pkg.HeartbeatEndpoint)
+	println(os.Getenv("EXEC_MODE"))
+	if os.Getenv("EXEC_MODE") == "DEBUG" {
+		println("DEUBG MODE")
+		r.GET("/heartbeat", pkg.HeartbeatDebugEndpoint)
+	} else {
+		r.GET("/heartbeat", pkg.HeartbeatEndpoint)
+	}
 
 	r.Run(":" + os.Getenv("INTERNAL_PORT"))
 }

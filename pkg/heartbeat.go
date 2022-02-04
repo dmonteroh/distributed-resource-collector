@@ -9,3 +9,7 @@ import (
 func HeartbeatEndpoint(c *gin.Context) {
 	c.JSON(200, internal.GetServerStats())
 }
+
+func HeartbeatDebugEndpoint(c *gin.Context) {
+	c.JSON(200, internal.GetServerStats().String())
+}
