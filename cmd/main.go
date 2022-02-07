@@ -44,11 +44,14 @@ func main() {
 	r.Run(":" + listenPort)
 }
 
+// Adds every key and value in map to the gin context as middleware. Allows access to these variables from inside the handlers
 func enviromentMiddleware(variables map[string]string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		for key, value := range variables {
-			c.Set(key, value)
-			c.Next()
+			if key != "" && value != "" {
+				c.Set(key, value)
+				c.Next()
+			}
 		}
 	}
 }

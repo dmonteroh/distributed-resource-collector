@@ -11,27 +11,32 @@ import (
 	"github.com/dmonteroh/distributed-resource-collector/internal"
 )
 
-func HeartbeatEndpoint(c *gin.Context) {
-	execMode, ok := c.MustGet("EXEC_MODE").(string)
-	if !ok {
-		println("Error: EXEC_MODE not available in Middleware")
-	} else {
-		if execMode == "DEBUG" {
-			c.JSON(200, internal.GetServerStats().String())
-		} else {
-			c.JSON(200, internal.GetServerStats())
-		}
+func recoverEndpoint(c *gin.Context) {
+	if err := recover(); err != nil {
+		msg := "Error: [Recovered] " + err.(string)
+		fmt.Println(msg)
+		c.JSON(400, gin.H{"error": msg})
 	}
 }
 
-func RecoverHeartbeat() {
+func HeartbeatEndpoint(c *gin.Context) {
+	defer recoverEndpoint(c)
+	execMode := c.MustGet("EXEC_MODE").(string)
+	if execMode == "DEBUG" {
+		c.JSON(200, internal.GetServerStats().String())
+	} else {
+		c.JSON(200, internal.GetServerStats())
+	}
+}
+
+func recoverHeartbeat() {
 	if r := recover(); r != nil {
 		fmt.Println("Recovered from ", r)
 	}
 }
 
 func sendHeartbeat(url string, execMode string) {
-	defer RecoverHeartbeat()
+	defer recoverHeartbeat()
 	body := internal.GetServerStats()
 	if execMode == "DEBUG" {
 		fmt.Println("DEUBG MODE - POST")
