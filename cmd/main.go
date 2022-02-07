@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -25,53 +24,31 @@ func main() {
 	app := strings.Join([]string{appProtocol, strings.Join([]string{appIP, appUrl}, "/")}, "://")
 	appCron, _ := strconv.Atoi(internal.GetEnv("APP_CRON", "30"))
 
-	// HTTP SERVER ROUTES
-	if execMode == "DEBUG" {
-		println("DEUBG MODE")
-		r.GET("/heartbeat", pkg.HeartbeatDebugEndpoint)
-	} else {
-		r.GET("/heartbeat", pkg.HeartbeatEndpoint)
+	// MAP VARIABLES INTO MAP
+	variables := map[string]string{
+		"EXEC_MODE": execMode,
 	}
 
+	// SAVE VARIABLES INSIDE GIN CONTEXT
+	r.Use(enviromentMiddleware(variables))
+
+	// HTTP SERVER ROUTES
+	r.GET("/heartbeat", pkg.HeartbeatEndpoint)
+
 	// HEARTBEAT POSTING
-	//go heartbeatCron(appCron, app, execMode)
-	// go func() {
-	// 	cron := gocron.NewScheduler(time.UTC)
-	// 	cron.Every(appCron).Seconds().Do(pkg.SendHeartbeat(app, execMode))
-	// 	cron.StartBlocking()
-	// }()
 	cron := gocron.NewScheduler(time.Local)
-	heartbeatCron(cron, appCron, app, execMode)
+	pkg.HeartbeatCron(cron, appCron, app, execMode)
 	cron.StartAsync()
 
 	// HTTP SERVER
 	r.Run(":" + listenPort)
 }
 
-func recoverCron() {
-	if r := recover(); r != nil {
-		fmt.Println("Recovered from ", r)
-	}
-}
-
-func debugCron(cronRes *gocron.Job) {
-	fmt.Println("RUN COUNT:", cronRes.RunCount())
-	fmt.Println("NEXT RUN: ", cronRes.NextRun())
-}
-
-func heartbeatCron(cron *gocron.Scheduler, seconds int, app string, execMode string) {
-
-	defer recoverCron()
-	cronRes, cronErr := cron.Every(seconds).Seconds().Do(pkg.SendHeartbeat, app, execMode)
-	if cronErr != nil {
-		panic(cronErr)
-	}
-	go func() {
-		if execMode == "DEBUG" {
-			_, cronErrDebug := cron.Every(seconds).Seconds().Do(debugCron, cronRes)
-			if cronErrDebug != nil {
-				panic(cronErr)
-			}
+func enviromentMiddleware(variables map[string]string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		for key, value := range variables {
+			c.Set(key, value)
+			c.Next()
 		}
-	}()
+	}
 }
