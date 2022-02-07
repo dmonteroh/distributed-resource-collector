@@ -5,6 +5,9 @@ WORKDIR /app
 COPY go.mod go.sum .env ./
 RUN go mod download
 
+# For DEBUGGING purposes
+# RUN apk update && apk add curl
+
 COPY . .
 
 RUN go install github.com/cespare/reflex@latest
