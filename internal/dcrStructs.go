@@ -117,3 +117,12 @@ func (d DrcStats) String() string {
 	s, _ := json.Marshal(d)
 	return string(s)
 }
+
+func (d DrcStats) Marshal() []byte {
+	s, err := json.Marshal(d)
+	if err != nil {
+		return s
+	} else {
+		return nil
+	}
+}
