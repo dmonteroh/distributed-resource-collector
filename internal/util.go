@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CheckError(err error) {
@@ -50,8 +52,36 @@ func InDockerContainer() bool {
 }
 
 func GetEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
+	if value, ok := os.LookupEnv(key); ok && value != "" {
+		fmt.Println(value)
 		return value
 	}
 	return fallback
+}
+
+// Adds every key and value in map to the gin context as middleware. Allows access to these variables from inside the handlers
+func EnviromentMiddleware(variables map[string]string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		for key, value := range variables {
+			if key != "" && value != "" {
+				c.Set(key, value)
+				c.Next()
+			}
+		}
+	}
+}
+
+func RecoverEndpoint(c *gin.Context) {
+	if err := recover(); err != nil {
+		msg := "Error: [Recovered] "
+		switch errType := err.(type) {
+		case string:
+			msg += err.(string)
+		case error:
+			msg += errType.Error()
+		default:
+		}
+		fmt.Println(msg)
+		c.JSON(400, gin.H{"error": msg})
+	}
 }

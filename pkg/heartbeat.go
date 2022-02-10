@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,16 +12,8 @@ import (
 	"github.com/dmonteroh/distributed-resource-collector/internal"
 )
 
-func recoverEndpoint(c *gin.Context) {
-	if err := recover(); err != nil {
-		msg := "Error: [Recovered] " + err.(string)
-		fmt.Println(msg)
-		c.JSON(400, gin.H{"error": msg})
-	}
-}
-
 func HeartbeatEndpoint(c *gin.Context) {
-	defer recoverEndpoint(c)
+	defer internal.RecoverEndpoint(c)
 	execMode := c.MustGet("EXEC_MODE").(string)
 	if execMode == "DEBUG" {
 		c.JSON(200, internal.GetServerStats().String())
@@ -30,8 +23,17 @@ func HeartbeatEndpoint(c *gin.Context) {
 }
 
 func recoverHeartbeat() {
-	if r := recover(); r != nil {
-		fmt.Println("Recovered from ", r)
+	if err := recover(); err != nil {
+		fmt.Println("RECOVER HEARTBEAT")
+		msg := "Error: [Recovered] "
+		switch errType := err.(type) {
+		case string:
+			msg += err.(string)
+		case *json.SyntaxError:
+			msg += errType.Error()
+		default:
+		}
+		fmt.Println(msg)
 	}
 }
 
@@ -44,6 +46,8 @@ func sendHeartbeat(url string, execMode string) {
 	}
 	res, err := http.Post(url, "application/json", bytes.NewBuffer(body.Marshal()))
 	if err != nil {
+		fmt.Println(res)
+		fmt.Println(err)
 		panic(err)
 	}
 
@@ -52,8 +56,17 @@ func sendHeartbeat(url string, execMode string) {
 }
 
 func recoverCron() {
-	if r := recover(); r != nil {
-		fmt.Println("Recovered from ", r)
+	if err := recover(); err != nil {
+		fmt.Println("RECOVER HEARTBEAT")
+		msg := "Error: [Recovered] "
+		switch errType := err.(type) {
+		case string:
+			msg += err.(string)
+		case *json.SyntaxError:
+			msg += errType.Error()
+		default:
+		}
+		fmt.Println(msg)
 	}
 }
 

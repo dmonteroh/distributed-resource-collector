@@ -119,10 +119,6 @@ func (d DrcStats) String() string {
 }
 
 func (d DrcStats) Marshal() []byte {
-	s, err := json.Marshal(d)
-	if err != nil {
-		return s
-	} else {
-		return nil
-	}
+	s, _ := json.Marshal(d)
+	return s
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -23,6 +24,7 @@ func main() {
 	appUrl := internal.GetEnv("APP_URL", "collector")
 	app := strings.Join([]string{appProtocol, strings.Join([]string{appIP, appUrl}, "/")}, "://")
 	appCron, _ := strconv.Atoi(internal.GetEnv("APP_CRON", "30"))
+	heartbeat, _ := strconv.ParseBool(internal.GetEnv("HEARTBEAT", "true"))
 
 	// MAP VARIABLES INTO MAP
 	variables := map[string]string{
@@ -30,28 +32,20 @@ func main() {
 	}
 
 	// SAVE VARIABLES INSIDE GIN CONTEXT
-	r.Use(enviromentMiddleware(variables))
+	r.Use(internal.EnviromentMiddleware(variables))
 
 	// HTTP SERVER ROUTES
 	r.GET("/heartbeat", pkg.HeartbeatEndpoint)
+	r.POST("/latency", pkg.LatencyEndpoint)
 
 	// HEARTBEAT POSTING
-	cron := gocron.NewScheduler(time.Local)
-	pkg.HeartbeatCron(cron, appCron, app, execMode)
-	cron.StartAsync()
+	if heartbeat {
+		fmt.Println("INITIATE HEARTBEAT SCHEDULER")
+		cron := gocron.NewScheduler(time.Local)
+		pkg.HeartbeatCron(cron, appCron, app, execMode)
+		cron.StartAsync()
+	}
 
 	// HTTP SERVER
 	r.Run(":" + listenPort)
-}
-
-// Adds every key and value in map to the gin context as middleware. Allows access to these variables from inside the handlers
-func enviromentMiddleware(variables map[string]string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		for key, value := range variables {
-			if key != "" && value != "" {
-				c.Set(key, value)
-				c.Next()
-			}
-		}
-	}
 }
