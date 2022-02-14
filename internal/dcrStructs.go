@@ -3,6 +3,8 @@ package internal
 import (
 	"encoding/json"
 	"time"
+
+	"github.com/wI2L/jettison"
 )
 
 // -- CPU
@@ -14,7 +16,7 @@ type DrcCPUStats struct {
 }
 
 func (d DrcCPUStats) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -31,7 +33,7 @@ type DrcDiskStats struct {
 }
 
 func (d DrcDiskStats) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -43,7 +45,7 @@ type DrcMemStats struct {
 }
 
 func (d DrcMemStats) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -56,7 +58,7 @@ type DrcProcStats struct {
 }
 
 func (d DrcProcStats) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -70,7 +72,7 @@ type DrcDockerStats struct {
 }
 
 func (d DrcDockerStats) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -82,7 +84,7 @@ type DrcTimestamp struct {
 }
 
 func (d DrcTimestamp) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -98,7 +100,7 @@ type DrcHost struct {
 }
 
 func (d DrcHost) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
@@ -113,12 +115,51 @@ type DrcStats struct {
 	DockerSats []DrcDockerStats `json:"dockerStats"`
 }
 
+type StoredStat struct {
+	ID         string           `json:"id"`
+	Timestamp  DrcTimestamp     `json:"timestamp"`
+	DrcHost    DrcHost          `json:"host"`
+	CPUStats   DrcCPUStats      `json:"cpuStats"`
+	MemStats   DrcMemStats      `json:"memStats"`
+	DiskStats  []DrcDiskStats   `json:"diskStats"`
+	ProcStats  DrcProcStats     `json:"procStats"`
+	DockerSats []DrcDockerStats `json:"dockerStats"`
+}
+
+func JsonToStoredStat(v string) (storedStat StoredStat, err error) {
+	err = json.Unmarshal([]byte(v), &storedStat)
+	return storedStat, err
+}
+
+func ArrayStoredStat(v string) (storedStats []StoredStat, err error) {
+	err = json.Unmarshal([]byte(v), &storedStats)
+	return storedStats, err
+}
+
 func (d DrcStats) String() string {
-	s, _ := json.Marshal(d)
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
 	return string(s)
 }
 
-func (d DrcStats) Marshal() []byte {
-	s, _ := json.Marshal(d)
-	return s
+func DrcJsonToStruct(v string) (drcStats DrcStats, err error) {
+	err = json.Unmarshal([]byte(v), &drcStats)
+	return drcStats, err
+}
+
+func ConvertToStorage(drcStats DrcStats) StoredStat {
+	return StoredStat{
+		ID:         "",
+		Timestamp:  drcStats.Timestamp,
+		DrcHost:    drcStats.DrcHost,
+		CPUStats:   drcStats.CPUStats,
+		MemStats:   drcStats.MemStats,
+		DiskStats:  drcStats.DiskStats,
+		ProcStats:  drcStats.ProcStats,
+		DockerSats: drcStats.DockerSats,
+	}
+}
+
+func (d StoredStat) String() string {
+	s, _ := jettison.MarshalOpts(d, jettison.NilMapEmpty(), jettison.NilSliceEmpty())
+	return string(s)
 }
