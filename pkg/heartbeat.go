@@ -44,7 +44,7 @@ func sendHeartbeat(url string, execMode string) {
 		fmt.Println("DEUBG MODE - POST")
 		fmt.Println(body.String())
 	}
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(body.Marshal()))
+	res, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(body.String())))
 	if err != nil {
 		fmt.Println(res)
 		fmt.Println(err)

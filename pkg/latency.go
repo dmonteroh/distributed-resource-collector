@@ -25,8 +25,8 @@ func LatencyEndpoint(c *gin.Context) {
 	}
 
 	latencyResults := internal.LatencyResults{
-		Hostname: latencyTargets.Hostname,
-		Results:  []internal.LatencyResult{},
+		Source:  latencyTargets.Source,
+		Results: []internal.LatencyResult{},
 	}
 
 	for _, target := range latencyTargets.Targets {
@@ -43,7 +43,6 @@ func LatencyEndpoint(c *gin.Context) {
 				if execMode == "DEBUG" {
 					fmt.Println(result)
 				}
-
 			} else {
 				elapsed = int64(-1)
 			}
@@ -54,6 +53,14 @@ func LatencyEndpoint(c *gin.Context) {
 			c1 <- latencyResult
 		}(target)
 		latencyResults.Results = append(latencyResults.Results, <-c1)
+	}
+
+	// Timestamp after operations
+	tmpTime := time.Now()
+	latencyResults.Timestamp = internal.LatencyTimestamp{
+		TimeLocal:   tmpTime,
+		TimeSeconds: tmpTime.Unix(),
+		TimeNano:    tmpTime.UnixNano(),
 	}
 
 	if execMode == "DEBUG" {
@@ -70,9 +77,19 @@ func sshServer(target internal.LatencyTarget, cmd string, expected string) (stri
 			ssh.Password(target.HostPassword),
 		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		HostKeyAlgorithms: []string{
+			ssh.KeyAlgoRSA,
+			ssh.KeyAlgoDSA,
+			ssh.KeyAlgoECDSA256,
+			ssh.KeyAlgoECDSA384,
+			ssh.KeyAlgoECDSA521,
+			ssh.KeyAlgoED25519,
+		},
+		// optional tcp connect timeout
+		Timeout: 5 * time.Second,
 	}
 
-	client, err := ssh.Dial("tcp", fmt.Sprintf("%s:%s", target.Hostname, target.Hostport), config)
+	client, err := ssh.Dial("tcp", target.Hostname+":"+target.Hostport, config)
 	if err != nil {
 		return err.Error(), false
 	}
@@ -95,7 +112,7 @@ func sshServer(target internal.LatencyTarget, cmd string, expected string) (stri
 	}
 	defer stdin.Close()
 
-	err = session.Start(cmd)
+	err = session.Run(cmd)
 	if err != nil {
 		return fmt.Sprintf("unable to execute remote command: %s", err), false
 	}

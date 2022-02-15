@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,12 @@ func GetEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func DateFormatID(d int64) string {
+	t := time.Unix(d, 0)
+	layout := "2006-01-02T15:04:05"
+	return t.Format(layout)
 }
 
 func CheckError(err error) {
