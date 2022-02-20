@@ -1,24 +1,11 @@
 package internal
 
 import (
-	"encoding/json"
 	"strings"
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
 )
-
-type DrcCPUStats struct {
-	ModelName    string    `json:"modelName"`
-	VendorID     string    `json:"vendorId"`
-	AverageUsage float64   `json:"averageUsage"`
-	CoreUsage    []float64 `json:"coreUsage"`
-}
-
-func (d DrcCPUStats) String() string {
-	s, _ := json.Marshal(d)
-	return string(s)
-}
 
 func GetCPUUsage() (CPUStats DrcCPUStats) {
 	tmpCPU, _ := cpu.Percent(time.Second/5, true)
