@@ -21,7 +21,7 @@ type LatencyTarget struct {
 	HostPassword string `json:"hostPassword"`
 }
 
-func LatencyJsonToStrcut(v string) (targets LatencyTargets, err error) {
+func LatencyTargetsJsonToStruct(v string) (targets LatencyTargets, err error) {
 	err = json.Unmarshal([]byte(v), &targets)
 	return targets, err
 }

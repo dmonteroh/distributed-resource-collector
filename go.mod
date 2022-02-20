@@ -6,6 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-co-op/gocron v1.12.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
+	github.com/shomali11/parallelizer v0.0.0-20210506023428-ed2dd4732c78
 	github.com/wI2L/jettison v0.7.3
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 )

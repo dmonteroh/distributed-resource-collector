@@ -7,14 +7,19 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/shomali11/parallelizer"
 )
 
-func GetEnv(key, fallback string) string {
+func GetEnv(key string, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok && value != "" {
 		//fmt.Println(value)
 		return value
 	}
 	return fallback
+}
+
+func UrlMaker(protocol string, hostname string, endpoint string) string {
+	return strings.Join([]string{protocol, strings.Join([]string{hostname, endpoint}, "/")}, "://")
 }
 
 func DateFormatID(d int64) string {
@@ -66,13 +71,21 @@ func InDockerContainer() bool {
 	return false
 }
 
+// Adds the parallelization group to the gin context as middleware. Allows access to these variables from inside the handlers
+func GroupMiddleware(group *parallelizer.Group) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("latencyGroup", group)
+		//c.Next()
+	}
+}
+
 // Adds every key and value in map to the gin context as middleware. Allows access to these variables from inside the handlers
 func EnviromentMiddleware(variables map[string]string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		for key, value := range variables {
 			if key != "" && value != "" {
 				c.Set(key, value)
-				c.Next()
+				//c.Next()
 			}
 		}
 	}
