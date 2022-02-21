@@ -84,6 +84,11 @@ func GetDockerSocketStats() (result string) {
 	return result
 }
 
+// There are basically two ways to get Docker stats. If this program is running inside a container, we must connect to the Docker Unix Socket.
+// The Unix Socket has much more information than psUtil. At this point in time, I've configured so that we get the same information from both implementations.
+// In the future it might be worth it to remove the usage of psUtil's docker function, but it's not guaranteed that all palces where this application
+// is running will be using docker at all.
+
 func GetDockerStats() (dockerStats []DrcDockerStats) {
 	if InDockerContainer() {
 		tmpStats := DrcSocketJsonToStruct(GetDockerSocketStats())

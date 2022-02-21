@@ -13,11 +13,12 @@ import (
 )
 
 func main() {
-
+	// I was using RUNTIME to determine if parallelization started correctly, only for debugging
 	// fmt.Println("Version", runtime.Version())
 	// fmt.Println("NumCPU", runtime.NumCPU())
 	// fmt.Println("GOMAXPROCS", runtime.GOMAXPROCS(0))
 
+	// Create a GINGONIC http server
 	r := gin.Default()
 
 	// ENVIROMENTAL VARIABLES
@@ -51,7 +52,7 @@ func main() {
 	r.GET("/latency", pkg.LatencyEndpoint)
 	r.POST("/latency", pkg.ManualLatencyEndpoint)
 
-	// HEARTBEAT POSTING
+	// HEARTBEAT AND LATENCY AUTO POSTING
 	if heartbeat {
 		fmt.Println("INITIATE HEARTBEAT SCHEDULER")
 		cron := gocron.NewScheduler(time.Local)
@@ -60,6 +61,6 @@ func main() {
 		cron.StartAsync()
 	}
 
-	// HTTP SERVER
+	// Start listening on the desired port (similar to ros' spin, "blocks" thread)
 	r.Run(":" + listenPort)
 }

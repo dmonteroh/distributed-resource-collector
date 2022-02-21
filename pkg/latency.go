@@ -16,7 +16,6 @@ import (
 	"github.com/dmonteroh/distributed-resource-collector/internal"
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
-	"github.com/shomali11/parallelizer"
 )
 
 func LatencyEndpoint(c *gin.Context) {
@@ -59,8 +58,8 @@ func latencyTargetsHandler(url string) internal.LatencyTargets {
 }
 
 func latencyHandler(execMode string, latencyTargets internal.LatencyTargets) internal.LatencyResults {
-	latencyGroup := parallelizer.NewGroup(parallelizer.WithPoolSize(12), parallelizer.WithJobQueueSize(3))
-	defer latencyGroup.Close()
+	// latencyGroup := parallelizer.NewGroup(parallelizer.WithPoolSize(12), parallelizer.WithJobQueueSize(3))
+	// defer latencyGroup.Close()
 	latencyResults := internal.LatencyResults{
 		Source:  latencyTargets.Source,
 		Results: []internal.LatencyResult{},
@@ -119,6 +118,7 @@ func handleLatencyTarget(target internal.LatencyTarget, execMode string, c1 chan
 	defer waitGroup.Done()
 }
 
+// sshServer creates an SSH connection to the desired hostname, runs a command and compares the result of the command to the expected value
 func sshServer(target internal.LatencyTarget, cmd string, expected string) (string, bool) {
 	config := &ssh.ClientConfig{
 		User: target.HostUser,
