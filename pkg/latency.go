@@ -59,10 +59,15 @@ func latencyTargetsHandler(url string) (internal.LatencyTargets, error) {
 		panic(err)
 	}
 
+	//VALIDATIONS
 	//Validate that Latency Targets isn't empty
 	if len(latencyTargets.Targets) == 0 {
 		return internal.LatencyTargets{}, errors.New("latency: no targets found")
 	}
+	if latencyTargets.Source == "" {
+		return internal.LatencyTargets{}, errors.New("latency: source hostname unclear, can't create ID")
+	}
+
 	return latencyTargets, err
 }
 
