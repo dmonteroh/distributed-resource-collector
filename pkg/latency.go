@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -16,15 +17,17 @@ import (
 	"github.com/dmonteroh/distributed-resource-collector/internal"
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
-	"github.com/shomali11/parallelizer"
 )
 
 func LatencyEndpoint(c *gin.Context) {
 	defer internal.RecoverEndpoint(c)
 	execMode := c.MustGet("EXEC_MODE").(string)
 	targetsApp := c.MustGet("TARGETS_APP").(string)
-	latencyTargets := latencyTargetsHandler(targetsApp)
-
+	latencyTargets, err := latencyTargetsHandler(targetsApp)
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
 	latencyHandler(execMode, latencyTargets)
 }
 
@@ -40,7 +43,7 @@ func ManualLatencyEndpoint(c *gin.Context) {
 	c.JSON(200, latencyResults)
 }
 
-func latencyTargetsHandler(url string) internal.LatencyTargets {
+func latencyTargetsHandler(url string) (internal.LatencyTargets, error) {
 	res, err := http.Get(url)
 	if err != nil {
 		fmt.Println(res)
@@ -55,12 +58,22 @@ func latencyTargetsHandler(url string) internal.LatencyTargets {
 		fmt.Println(err)
 		panic(err)
 	}
-	return latencyTargets
+
+	//VALIDATIONS
+	//Validate that Latency Targets isn't empty
+	if len(latencyTargets.Targets) == 0 {
+		return internal.LatencyTargets{}, errors.New("latency: no targets found")
+	}
+	if latencyTargets.Source == "" {
+		return internal.LatencyTargets{}, errors.New("latency: source hostname unclear, can't create ID")
+	}
+
+	return latencyTargets, err
 }
 
 func latencyHandler(execMode string, latencyTargets internal.LatencyTargets) internal.LatencyResults {
-	latencyGroup := parallelizer.NewGroup(parallelizer.WithPoolSize(12), parallelizer.WithJobQueueSize(3))
-	defer latencyGroup.Close()
+	// latencyGroup := parallelizer.NewGroup(parallelizer.WithPoolSize(12), parallelizer.WithJobQueueSize(3))
+	// defer latencyGroup.Close()
 	latencyResults := internal.LatencyResults{
 		Source:  latencyTargets.Source,
 		Results: []internal.LatencyResult{},
@@ -119,6 +132,7 @@ func handleLatencyTarget(target internal.LatencyTarget, execMode string, c1 chan
 	defer waitGroup.Done()
 }
 
+// sshServer creates an SSH connection to the desired hostname, runs a command and compares the result of the command to the expected value
 func sshServer(target internal.LatencyTarget, cmd string, expected string) (string, bool) {
 	config := &ssh.ClientConfig{
 		User: target.HostUser,
@@ -181,25 +195,29 @@ func sshServer(target internal.LatencyTarget, cmd string, expected string) (stri
 
 func sendLatency(targetUrl string, latencyUrl string, execMode string) {
 	defer recoverHeartbeat()
-	latencyTargets := latencyTargetsHandler(targetUrl)
-	latencyResults := latencyHandler(execMode, latencyTargets)
-	if execMode == "DEBUG" {
-		fmt.Println("DEUBG MODE - POST")
-		fmt.Println(latencyResults.String())
-	}
-	res, err := http.Post(latencyUrl, "application/json", bytes.NewBuffer([]byte(latencyResults.String())))
-	if err != nil {
-		fmt.Println(res)
-		fmt.Println(err)
-		panic(err)
-	}
+	latencyTargets, err := latencyTargetsHandler(targetUrl)
+	if err == nil {
+		latencyResults := latencyHandler(execMode, latencyTargets)
+		if execMode == "DEBUG" {
+			fmt.Println("DEUBG MODE - POST")
+			fmt.Println(latencyResults.String())
+		}
+		res, err := http.Post(latencyUrl, "application/json", bytes.NewBuffer([]byte(latencyResults.String())))
+		if err != nil {
+			fmt.Println(res)
+			fmt.Println(err)
+			panic(err)
+		}
 
-	defer res.Body.Close()
-	fmt.Println(res.Body)
+		defer res.Body.Close()
+		fmt.Println(res.Body)
+	} else {
+		fmt.Println(err)
+		//No panic required, cron is not expecting function to return anything
+	}
 }
 
 func LatencyCron(cron *gocron.Scheduler, seconds int, targetUrl string, latencyUrl string, execMode string) {
-
 	defer recoverCron()
 	cronRes, cronErr := cron.Every(seconds).Seconds().Do(sendLatency, targetUrl, latencyUrl, execMode)
 	if cronErr != nil {

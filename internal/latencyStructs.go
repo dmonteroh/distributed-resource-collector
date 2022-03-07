@@ -96,6 +96,9 @@ func CreateLatencyAsset(id string, latencyResults LatencyResults) LatencyAsset {
 	}
 }
 
+// We can create the ID because the Fabric App is letting us know the IP that's running this program
+// Since we always ask which servers we should detect the latency anyway, we can create the ID here.
+// Unlike with the resource usage collector, in which we always just blindly push our stats.
 func CreateLatencyID(appType string, source string, timestamp LatencyTimestamp) string {
 	if appType == "single_insert" {
 		return source + "-" + DateFormatID(timestamp.TimeSeconds)

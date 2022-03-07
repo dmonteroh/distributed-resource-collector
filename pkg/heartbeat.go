@@ -70,13 +70,13 @@ func recoverCron() {
 	}
 }
 
+// This debugging job returns the amount of jobs that have run, and the time for the next expected run
 func debugCron(cronRes *gocron.Job) {
 	fmt.Println("RUN COUNT:", cronRes.RunCount())
 	fmt.Println("NEXT RUN: ", cronRes.NextRun())
 }
 
 func HeartbeatCron(cron *gocron.Scheduler, seconds int, app string, execMode string) {
-
 	defer recoverCron()
 	cronRes, cronErr := cron.Every(seconds).Seconds().Do(sendHeartbeat, app, execMode)
 	if cronErr != nil {
