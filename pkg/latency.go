@@ -25,7 +25,6 @@ func LatencyEndpoint(c *gin.Context) {
 	targetsApp := c.MustGet("TARGETS_APP").(string)
 	latencyTargets, err := latencyTargetsHandler(targetsApp)
 	if err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 	latencyHandler(execMode, latencyTargets)
@@ -46,16 +45,12 @@ func ManualLatencyEndpoint(c *gin.Context) {
 func latencyTargetsHandler(url string) (internal.LatencyTargets, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		fmt.Println(res)
-		fmt.Println(err)
 		panic(err)
 	}
 	defer res.Body.Close()
 	jsonData, _ := ioutil.ReadAll(res.Body)
 	latencyTargets, err := internal.LatencyTargetsJsonToStruct(string(jsonData))
 	if err != nil {
-		fmt.Println(res)
-		fmt.Println(err)
 		panic(err)
 	}
 
@@ -204,16 +199,10 @@ func sendLatency(targetUrl string, latencyUrl string, execMode string) {
 		}
 		res, err := http.Post(latencyUrl, "application/json", bytes.NewBuffer([]byte(latencyResults.String())))
 		if err != nil {
-			fmt.Println(res)
-			fmt.Println(err)
 			panic(err)
 		}
 
 		defer res.Body.Close()
-		fmt.Println(res.Body)
-	} else {
-		fmt.Println(err)
-		//No panic required, cron is not expecting function to return anything
 	}
 }
 

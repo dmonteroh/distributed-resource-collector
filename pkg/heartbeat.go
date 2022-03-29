@@ -24,7 +24,6 @@ func HeartbeatEndpoint(c *gin.Context) {
 
 func recoverHeartbeat() {
 	if err := recover(); err != nil {
-		fmt.Println("RECOVER HEARTBEAT")
 		msg := "Error: [Recovered] "
 		switch errType := err.(type) {
 		case string:
@@ -41,23 +40,18 @@ func sendHeartbeat(url string, execMode string) {
 	defer recoverHeartbeat()
 	body := internal.GetServerStats()
 	if execMode == "DEBUG" {
-		fmt.Println("DEUBG MODE - POST")
 		fmt.Println(body.String())
 	}
 	res, err := http.Post(url, "application/json", bytes.NewBuffer([]byte(body.String())))
 	if err != nil {
-		fmt.Println(res)
-		fmt.Println(err)
 		panic(err)
 	}
 
 	defer res.Body.Close()
-	fmt.Println(res.Body)
 }
 
 func recoverCron() {
 	if err := recover(); err != nil {
-		fmt.Println("RECOVER HEARTBEAT")
 		msg := "Error: [Recovered] "
 		switch errType := err.(type) {
 		case string:
@@ -66,7 +60,6 @@ func recoverCron() {
 			msg += errType.Error()
 		default:
 		}
-		fmt.Println(msg)
 	}
 }
 
