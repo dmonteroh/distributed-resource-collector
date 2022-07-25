@@ -39,9 +39,9 @@ func (d DrcDiskStats) String() string {
 
 // -- MEMORY / RAM
 type DrcMemStats struct {
-	Total     uint64 `json:"total"`
-	Available uint64 `json:"available"`
-	Used      uint64 `json:"used"`
+	Total     uint64  `json:"total"`
+	Available uint64  `json:"available"`
+	Used      float64 `json:"used"`
 }
 
 func (d DrcMemStats) String() string {

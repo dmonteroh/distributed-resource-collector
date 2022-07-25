@@ -9,6 +9,6 @@ func GetMemoryUsage() (MemStats DrcMemStats) {
 	return DrcMemStats{
 		Total:     tmpMem.Total,
 		Available: tmpMem.Available,
-		Used:      tmpMem.Used,
+		Used:      tmpMem.UsedPercent,
 	}
 }
