@@ -1,3 +1,5 @@
+The design and development of this system is described in a MSc Thesis titled "Distributed Ledger Technologies for Managing Heterogeneous Computing and Sensing Systems at the Edge", which can be accessed [here](https://bit.ly/dmonteroMScThesis). For instructions on installation, please see the Thesis-related [GitHub](https://github.com/TIERS/fabric-edge-node-selector)
+
 # Distributed Resource Collector & Heartbeat
 Simple webserver that collects relevant system data, and measures the latency between the DRC host and all the hostnames received.
 
